@@ -353,10 +353,15 @@ def training_loop(
                 metrics.run(pkl, run_dir=dnnlib.make_run_dir_path(), data_dir=dnnlib.convert_path(data_dir), num_gpus=num_gpus, tf_config=tf_config)
 
             # Update summaries and RunContext.
+            print("metrics")
             metrics.update_autosummaries()
+            print("austosumary")
             tflib.autosummary.save_summaries(summary_log, cur_nimg)
+            print("update context")
             dnnlib.RunContext.get().update('%.2f' % sched.lod, cur_epoch=cur_nimg // 1000, max_epoch=total_kimg)
+            print("maintenance")
             maintenance_time = dnnlib.RunContext.get().get_last_update_interval() - tick_time
+            print("end")
 
     # Save final snapshot.
     misc.save_pkl((G, D, Gs), dnnlib.make_run_dir_path('network-final.pkl'))
