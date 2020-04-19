@@ -127,8 +127,8 @@ def training_loop(
     total_kimg              = 25000,    # Total length of the training, measured in thousands of real images.
     mirror_augment          = False,    # Enable mirror augment?
     drange_net              = [-1,1],   # Dynamic range used when feeding image data to the networks.
-    image_snapshot_ticks    = 50,       # How often to save image snapshots? None = only save 'reals.png' and 'fakes-init.png'.
-    network_snapshot_ticks  = 50,       # How often to save network snapshots? None = only save 'networks-final.pkl'.
+    image_snapshot_ticks    = 2,       # How often to save image snapshots? None = only save 'reals.png' and 'fakes-init.png'.
+    network_snapshot_ticks  = 2,       # How often to save network snapshots? None = only save 'networks-final.pkl'.
     save_tf_graph           = False,    # Include full TensorFlow computation graph in the tfevents file?
     save_weight_histograms  = False,    # Include weight histograms in the tfevents file?
     resume_pkl              = None,     # Network pickle to resume training from, None = train from scratch.
@@ -153,6 +153,8 @@ def training_loop(
         print("Using Last pickle file")
         print(resume_pkl)
         print(resume_kimg)
+    else:
+        print("STARTING FROM SCRATCH")
 
     # Construct or load networks.
     with tf.device('/gpu:0'):
@@ -353,15 +355,10 @@ def training_loop(
                 metrics.run(pkl, run_dir=dnnlib.make_run_dir_path(), data_dir=dnnlib.convert_path(data_dir), num_gpus=num_gpus, tf_config=tf_config)
 
             # Update summaries and RunContext.
-            print("metrics")
             metrics.update_autosummaries()
-            print("austosumary")
             tflib.autosummary.save_summaries(summary_log, cur_nimg)
-            print("update context")
             dnnlib.RunContext.get().update('%.2f' % sched.lod, cur_epoch=cur_nimg // 1000, max_epoch=total_kimg)
-            print("maintenance")
             maintenance_time = dnnlib.RunContext.get().get_last_update_interval() - tick_time
-            print("end")
 
     # Save final snapshot.
     misc.save_pkl((G, D, Gs), dnnlib.make_run_dir_path('network-final.pkl'))
