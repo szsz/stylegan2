@@ -277,7 +277,7 @@ def training_loop(
     running_mb_counter = 0
     while cur_nimg < total_kimg * 1000:
         if dnnlib.RunContext.get().should_stop(): break
-
+        print(cur_nimg)
         # Choose training parameters and configure training ops.
         sched = training_schedule(cur_nimg=cur_nimg, training_set=training_set, **sched_args)
         assert sched.minibatch_size % (sched.minibatch_gpu * num_gpus) == 0
