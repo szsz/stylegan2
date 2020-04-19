@@ -15,6 +15,9 @@ from dnnlib.tflib.autosummary import autosummary
 from training import dataset
 from training import misc
 from metrics import metric_base
+import os
+import re
+import glob
 
 #----------------------------------------------------------------------------
 # Just-in-time processing of training images before feeding them to the networks.
@@ -141,6 +144,15 @@ def training_loop(
     training_set = dataset.load_dataset(data_dir=dnnlib.convert_path(data_dir), verbose=True, **dataset_args)
     grid_size, grid_reals, grid_labels = misc.setup_snapshot_image_grid(training_set, **grid_args)
     misc.save_image_grid(grid_reals, dnnlib.make_run_dir_path('reals.png'), drange=training_set.dynamic_range, grid_size=grid_size)
+
+    allpickles = sorted(glob.glob(os.path.join("./results/", '0*', 'network-*.pkl')))
+    if len(allpickles) > 0:
+        resume_pkl = allpickles[-1]
+        RE_KIMG = re.compile('network-snapshot-(\d+).pkl')
+        resume_kimg = int(RE_KIMG.match(os.path.basename(resume_pkl)).group(1))
+        print("Using Last pickle file")
+        print(resume_pkl)
+        print(resume_kimg)
 
     # Construct or load networks.
     with tf.device('/gpu:0'):

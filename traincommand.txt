@@ -1,0 +1,1 @@
+python run_training.py --num-gpus=1 --data-dir=F:/datasets/ --config=config-f --dataset=testdataset --total-kimg 25000
